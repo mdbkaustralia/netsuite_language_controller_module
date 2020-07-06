@@ -49,8 +49,32 @@ define(['N/runtime','N/file'], function (runtime, file) {
         return str;
     }
 
+    exports.json = function() {
+        preloadStrings();
+        var output = {};
+        output[LANGUAGE_FILE] = LANGUAGE_STRINGS;
+        output[FALLBACK_LANGUAGE_FILE] = FALLBACK_LANGUAGE_STRINGS;
+        return JSON.stringify(output);
+    }
+
+    exports.formField = function(form,serverWidget) {
+        var field = form.addField({
+            id: 'cust_mdbk_language_strings',
+            label: 'MDBK Language Strings',
+            type: serverWidget.FieldType.INLINEHTML
+        });
+        field.defaultValue = '<script>MDBK_Language_Strings='+exports.json()+';</script>';
+    }
+
+    exports.addStrings = function(obj) {
+        LANGUAGE_STRINGS = obj[LANGUAGE_FILE];
+        FALLBACK_LANGUAGE_FILE = obj[FALLBACK_LANGUAGE_FILE];
+        FIRST_RUN=false;
+    }
+
     var preloadStrings = function() {
         FIRST_RUN = false;
+        if(!file) return;
         if(!LANGUAGE_FILE || !FALLBACK_LANGUAGE_FILE) return;
 
         if(LANGUAGE_FILE) {
