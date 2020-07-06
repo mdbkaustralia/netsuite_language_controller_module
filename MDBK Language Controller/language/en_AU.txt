@@ -1,0 +1,7 @@
+DELIMITER=::::
+Hi {name}. Are you feeling {adjective}?::::G'day, {name}. Ya feelin' {adjective}?
+POLITE_GOODBYE::::Goodbye, {name}
+FOOD.HEALTHY::::Salad
+FOOD.UNHEALTHY::::Outlaw Pizza
+FOOD.APPLES::::Granny Smith Apples
+FOOD.ORANGES::::Aussie Oranges

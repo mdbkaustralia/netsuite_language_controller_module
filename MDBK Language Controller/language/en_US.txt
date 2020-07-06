@@ -1,0 +1,5 @@
+Hi {name}. Are you feeling {adjective}?=Hey, {name}. Are you feeling {adjective}?
+POLITE_GOODBYE=Have a nice day, {name}
+FOOD.UNHEALTHY=Dominos Pizza
+FOOD.APPLES=red apples
+FOOD.ORANGES=oranges
