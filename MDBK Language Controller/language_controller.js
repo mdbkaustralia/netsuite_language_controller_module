@@ -125,6 +125,14 @@ define(['N/runtime','N/file'], function (runtime, file) {
     }
 
     function getTranslation(input,lang) {
+        if(typeof input == 'object') {
+            var obj = {};
+            for (var property in input) {
+                if (!input.hasOwnProperty(property)) continue;
+                obj[property] = getTranslation(input[property],lang);
+            }
+            return obj;
+        }
         var str;
 
         str = LANGUAGE_STRINGS[input];
