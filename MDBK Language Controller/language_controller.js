@@ -11,7 +11,7 @@
  * 
  * For complete list of authors, please refer to https://github.com/mdbkaustralia/netsuite_language_controller_module
  * 
- * MDBK Language Controller Module is licensed under the GNU General Public License version 3.
+ * MDBK Language Controller Module is distributed under the MIT License.
  * 
  * @NApiVersion 2.0
  */
