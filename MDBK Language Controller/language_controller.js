@@ -75,7 +75,7 @@ define(['N/runtime','N/file'], function (runtime, file) {
     var preloadStrings = function() {
         FIRST_RUN = false;
         if(!file) return;
-        if(!LANGUAGE_FILE || !FALLBACK_LANGUAGE_FILE) return;
+        if(!LANGUAGE_FILE && !FALLBACK_LANGUAGE_FILE) return;
 
         if(LANGUAGE_FILE) {
             try {
