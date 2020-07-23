@@ -24,7 +24,6 @@ define(['N/runtime','N/file'], function (runtime, file) {
     var FIRST_RUN = true;
 
     exports.setLanguage = function(language) {
-        if(!FALLBACK_LANGUAGE_FILE) FALLBACK_LANGUAGE_FILE = language;
         LANGUAGE_FILE = language;      
     }
     exports.setFallbackLanguage = function(language) {
@@ -52,8 +51,8 @@ define(['N/runtime','N/file'], function (runtime, file) {
     exports.json = function() {
         preloadStrings();
         var output = {};
-        output[LANGUAGE_FILE] = LANGUAGE_STRINGS;
-        output[FALLBACK_LANGUAGE_FILE] = FALLBACK_LANGUAGE_STRINGS;
+        if(LANGUAGE_FILE != null) output[LANGUAGE_FILE] = LANGUAGE_STRINGS;
+        if(FALLBACK_LANGUAGE_FILE != null) output[FALLBACK_LANGUAGE_FILE] = FALLBACK_LANGUAGE_STRINGS;
         return JSON.stringify(output);
     }
 
@@ -67,8 +66,8 @@ define(['N/runtime','N/file'], function (runtime, file) {
     }
 
     exports.addStrings = function(obj) {
-        LANGUAGE_STRINGS = obj[LANGUAGE_FILE];
-        FALLBACK_LANGUAGE_FILE = obj[FALLBACK_LANGUAGE_FILE];
+        if(LANGUAGE_FILE && obj[LANGUAGE_FILE] != null) LANGUAGE_STRINGS = obj[LANGUAGE_FILE];
+        if(FALLBACK_LANGUAGE_FILE && obj[FALLBACK_LANGUAGE_FILE] != null) FALLBACK_LANGUAGE_STRINGS = obj[FALLBACK_LANGUAGE_FILE];
         FIRST_RUN=false;
     }
 
@@ -94,8 +93,6 @@ define(['N/runtime','N/file'], function (runtime, file) {
             } catch(e) {
                 log.debug('Failed to load/read fallback language file: '+language_file_path);
             }
-        } else {
-            FALLBACK_LANGUAGE_STRINGS = LANGUAGE_STRINGS;
         }
     }
 
@@ -135,10 +132,10 @@ define(['N/runtime','N/file'], function (runtime, file) {
         }
         var str;
 
-        str = LANGUAGE_STRINGS[input];
+        str = (typeof LANGUAGE_STRINGS == 'object' ? LANGUAGE_STRINGS[input] : null);
         if(str != null) return str;
 
-        str = FALLBACK_LANGUAGE_STRINGS[input];
+        str = (typeof FALLBACK_LANGUAGE_STRINGS == 'object' ? FALLBACK_LANGUAGE_STRINGS[input] : null);
         if(str != null) return str;
 
         return input;
