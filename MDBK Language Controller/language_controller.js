@@ -25,9 +25,11 @@ define(['N/runtime','N/file'], function (runtime, file) {
 
     exports.setLanguage = function(language) {
         LANGUAGE_FILE = language;      
+        LANGUAGE_STRINGS[LANGUAGE_FILE] = {};
     }
     exports.setFallbackLanguage = function(language) {
         FALLBACK_LANGUAGE_FILE = language;
+        LANGUAGE_STRINGS[FALLBACK_LANGUAGE_FILE] = {};
     }
     exports.getLanguage = function() {
         return LANGUAGE_FILE;
@@ -41,7 +43,7 @@ define(['N/runtime','N/file'], function (runtime, file) {
         var str = '';
         var args = Array.prototype.slice.call(arguments);
         for(var i=0;i<args.length;i++) {
-            args[i] = getTranslation(args[i]);
+            args[i] = exports.getTranslation(args[i]);
         }
 
         str = formatUnicorn.apply(null,args);
@@ -50,10 +52,7 @@ define(['N/runtime','N/file'], function (runtime, file) {
 
     exports.json = function() {
         preloadStrings();
-        var output = {};
-        if(LANGUAGE_FILE != null) output[LANGUAGE_FILE] = LANGUAGE_STRINGS;
-        if(FALLBACK_LANGUAGE_FILE != null) output[FALLBACK_LANGUAGE_FILE] = FALLBACK_LANGUAGE_STRINGS;
-        return JSON.stringify(output);
+        return JSON.stringify(LANGUAGE_STRINGS);
     }
 
     exports.formField = function(form,serverWidget) {
@@ -66,8 +65,7 @@ define(['N/runtime','N/file'], function (runtime, file) {
     }
 
     exports.addStrings = function(obj) {
-        if(LANGUAGE_FILE && obj[LANGUAGE_FILE] != null) LANGUAGE_STRINGS = obj[LANGUAGE_FILE];
-        if(FALLBACK_LANGUAGE_FILE && obj[FALLBACK_LANGUAGE_FILE] != null) FALLBACK_LANGUAGE_STRINGS = obj[FALLBACK_LANGUAGE_FILE];
+        LANGUAGE_STRINGS = obj;
         FIRST_RUN=false;
     }
 
@@ -79,17 +77,17 @@ define(['N/runtime','N/file'], function (runtime, file) {
         if(LANGUAGE_FILE) {
             try {
                 var language_file_path = './language/'+LANGUAGE_FILE+'.txt';
-                var language_file = file.load({id: language_file_path});
-                LANGUAGE_STRINGS = readLanguageFile(language_file);
+                var languagefileobj = file.load({id: language_file_path});
+                LANGUAGE_STRINGS[LANGUAGE_FILE] = readLanguageFile(languagefileobj);
             } catch(e) {
                 log.debug('Failed to load/read language file: '+language_file_path);
              }
         }
-        if(FALLBACK_LANGUAGE_FILE && (!LANGUAGE_STRINGS || FALLBACK_LANGUAGE_FILE != LANGUAGE_FILE)) {
+        if(FALLBACK_LANGUAGE_FILE && (FALLBACK_LANGUAGE_FILE != LANGUAGE_FILE)) {
             try {
                 var language_file_path = './language/'+FALLBACK_LANGUAGE_FILE+'.txt';
-                var language_file = file.load({id: language_file_path});
-                FALLBACK_LANGUAGE_STRINGS = readLanguageFile(language_file);
+                var languagefileobj = file.load({id: language_file_path});
+                LANGUAGE_STRINGS[FALLBACK_LANGUAGE_FILE] = readLanguageFile(languagefileobj);
             } catch(e) {
                 log.debug('Failed to load/read fallback language file: '+language_file_path);
             }
@@ -121,22 +119,25 @@ define(['N/runtime','N/file'], function (runtime, file) {
         return output;
     }
 
-    function getTranslation(input,lang) {
+    exports.getTranslation = function(input,lang) {
         if(typeof input == 'object') {
             var obj = {};
             for (var property in input) {
                 if (!input.hasOwnProperty(property)) continue;
-                obj[property] = getTranslation(input[property],lang);
+                obj[property] = exports.getTranslation(input[property],lang);
             }
             return obj;
         }
         var str;
 
-        str = (typeof LANGUAGE_STRINGS == 'object' ? LANGUAGE_STRINGS[input] : null);
-        if(str != null) return str;
+        if(lang && LANGUAGE_STRINGS[lang]) str = LANGUAGE_STRINGS[lang][input];
+        if(str) return str;
 
-        str = (typeof FALLBACK_LANGUAGE_STRINGS == 'object' ? FALLBACK_LANGUAGE_STRINGS[input] : null);
-        if(str != null) return str;
+        if(LANGUAGE_FILE) str = LANGUAGE_STRINGS[LANGUAGE_FILE][input];
+        if(str) return str;
+
+        if(FALLBACK_LANGUAGE_FILE) str = LANGUAGE_STRINGS[FALLBACK_LANGUAGE_FILE][input];
+        if(str) return str;
 
         return input;
     }
